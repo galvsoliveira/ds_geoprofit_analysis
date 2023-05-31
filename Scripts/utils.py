@@ -4,11 +4,54 @@ from sklearn.pipeline import Pipeline
 import joblib
 import pandas as pd
 from boruta import BorutaPy
+from imblearn.over_sampling import SMOTE, RandomOverSampler
+from imblearn.under_sampling import RandomUnderSampler
 
-def train_model_with_grid_search(X, y, model, param_grid, test_size=0.2, random_state=42, save_path='modelo_com_scaler_e_grid.joblib'):
+def balance_data(X, y, method='under', random_state=42):
+    """
+    Balance imbalanced data using the specified resampling method.
+
+    Parameters:
+    - X: The feature matrix.
+    - y: The target vector.
+    - method: The resampling method to use ('under', 'over', or 'smote').
+    - random_state: The random seed for reproducibility.
+
+    Returns:
+    - X_resampled: The resampled feature matrix.
+    - y_resampled: The resampled target vector.
+    """
+    if method == 'under':
+        # Random undersampling
+        resampler = RandomUnderSampler(random_state=random_state)
+    elif method == 'over':
+        # Random oversampling
+        resampler = RandomOverSampler(random_state=random_state)
+    elif method == 'smote':
+        # SMOTE oversampling
+        resampler = SMOTE(random_state=random_state)
+    else:
+        raise ValueError(f"Invalid method: {method}")
+
+    # Perform resampling
+    X_resampled, y_resampled = resampler.fit_resample(X, y)
+
+    return X_resampled, y_resampled
+
+def train_model_with_grid_search(X, y, model, param_grid, test_size=0.2, random_state=42, balance_training = None, save_path='modelo_com_scaler_e_grid.joblib'):
     # Dividir os dados em treinamento e teste
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
     
+    # Balancear os dados de treinamento
+    if balance_training == 'under':
+        X_train, y_train = balance_data(X_train, y_train, method='under', random_state=random_state)
+    elif balance_training == 'over':
+        X_train, y_train = balance_data(X_train, y_train, method='over', random_state=random_state)
+    elif balance_training == 'smote':
+        X_train, y_train = balance_data(X_train, y_train, method='smote', random_state=random_state)
+    elif balance_training == None:
+        pass
+
     # Criar um pipeline com o scaler embutido
     pipeline = Pipeline([
         ('scaler', StandardScaler()),  # Scaler
