@@ -3,6 +3,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 import joblib
 import pandas as pd
+from boruta import BorutaPy
 
 def train_model_with_grid_search(X, y, model, param_grid, test_size=0.2, random_state=42, save_path='modelo_com_scaler_e_grid.joblib'):
     # Dividir os dados em treinamento e teste
@@ -26,6 +27,7 @@ def train_model_with_grid_search(X, y, model, param_grid, test_size=0.2, random_
     # Avaliar o modelo no conjunto de teste
     test_score = grid_search.score(X_test, y_test)
     
+    print("Melhores parâmetros:", grid_search.best_params_)
     print("Modelo treinado e salvo com sucesso!")
     print("Score no conjunto de teste:", test_score)
 
@@ -78,3 +80,26 @@ def find_potential_outliers(df, target_col):
     result_df = pd.DataFrame(result)
 
     return result_df[result_df['n_outliers']!=0].sort_values("n_outliers", ascending=False)
+
+def run_boruta(X, y, estimator, max_iter=100, random_state=42):
+    """
+    Executa o algoritmo Boruta para seleção de recursos.
+
+    Parâmetros:
+    - X: Matriz de características.
+    - y: Vetor de variável alvo.
+    - estimator: Estimador base utilizado pelo Boruta.
+    - max_iter: Número máximo de iterações.
+    - random_state: Semente aleatória para reprodutibilidade.
+
+    Retorna:
+    - boruta_selector: Objeto BorutaPy contendo os resultados.
+    """
+
+    # Criar o objeto Boruta
+    boruta_selector = BorutaPy(estimator, n_estimators='auto', max_iter=max_iter, random_state=random_state)
+
+    # Executar o Boruta
+    boruta_selector.fit(X.values, y.values)
+
+    return boruta_selector
