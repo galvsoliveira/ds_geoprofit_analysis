@@ -2,6 +2,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 import joblib
+import pandas as pd
 
 def train_model_with_grid_search(X, y, model, param_grid, test_size=0.2, random_state=42, save_path='modelo_com_scaler_e_grid.joblib'):
     # Dividir os dados em treinamento e teste
@@ -37,3 +38,43 @@ def load_and_predict(X, model_path):
 
     # Retornar as previsões
     return predictions
+
+def find_potential_outliers(df, target_col):
+    result = []
+    numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
+
+    # Get the unique countries in the dataframe
+    countries = df[target_col].unique()
+
+    # Iterate over each target
+    for target in countries:
+        # Create a subset of the dataframe containing only rows for the given target
+        df_target = df[df[target_col] == target]
+
+        # Initialize a dictionary to store the outlier columns and values
+        outliers = {}
+
+        # Iterate over each column in the dataframe
+        for col in numerical_columns:
+            if col != target_col:
+                # Calculate the quartiles and interquartile range
+                Q1 = df[col].quantile(0.25)
+                Q3 = df[col].quantile(0.75)
+                IQR = Q3 - Q1
+
+                # Calculate the upper and lower bounds for outliers
+                lower_bound = Q1 - 1.5 * IQR
+                upper_bound = Q3 + 1.5 * IQR
+
+                # Check if any value in the column for the given target is an outlier
+                if any((df_target[col] < lower_bound) | (df_target[col] > upper_bound)):
+                    # Add the column name and value to the outliers dictionary
+                    outliers[col] = df_target[col].values[0]
+
+        # Append the target, number of outliers, and outliers dictionary to the result list
+        result.append({"target": target, "n_outliers": len(outliers), "outlier_dict": outliers})
+
+    # Create a new dataframe to store the results
+    result_df = pd.DataFrame(result)
+
+    return result_df[result_df['n_outliers']!=0].sort_values("n_outliers", ascending=False)
