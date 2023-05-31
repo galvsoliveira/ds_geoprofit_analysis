@@ -26,9 +26,10 @@ def train_model_with_grid_search(X, y, model, param_grid, test_size=0.2, random_
     
     # Avaliar o modelo no conjunto de teste
     test_score = grid_search.score(X_test, y_test)
-    
+
     print("Melhores parâmetros:", grid_search.best_params_)
     print("Modelo treinado e salvo com sucesso!")
+    print("Score no conjunto de treinamento:", grid_search.best_score_)
     print("Score no conjunto de teste:", test_score)
 
 def load_and_predict(X, model_path):
