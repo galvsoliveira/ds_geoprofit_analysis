@@ -109,13 +109,9 @@ def train_model_with_grid_search(X: pd.DataFrame,
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
     
     # Balance the training data
-    if balance_training == 'under':
-        X_train, y_train = balance_data(X_train, y_train, method='under', random_state=random_state)
-    elif balance_training == 'over':
-        X_train, y_train = balance_data(X_train, y_train, method='over', random_state=random_state)
-    elif balance_training == 'smote':
-        X_train, y_train = balance_data(X_train, y_train, method='smote', random_state=random_state)
-    elif balance_training is None:
+    if balance_training is not None:
+        X_train, y_train = balance_data(X_train, y_train, method=balance_training, random_state=random_state)
+    else:
         pass
 
     # Create the scaler object
