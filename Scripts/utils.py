@@ -230,7 +230,7 @@ def find_potential_outliers(df: pd.DataFrame, target_col: str):
 
     return result_df[result_df['n_outliers'] != 0].sort_values("n_outliers", ascending=False)
 
-def run_boruta(X: pd.DataFrame, y: pd.Series, estimator: Any, max_iter: int = 100, random_state: int = 42):
+def run_boruta(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, estimator: Any, max_iter: int = 100, random_state: int = 42):
     """
     Executar o algoritmo Boruta para seleção de recursos.
 
@@ -244,16 +244,22 @@ def run_boruta(X: pd.DataFrame, y: pd.Series, estimator: Any, max_iter: int = 10
     Retorna:
     - boruta_selector: Objeto BorutaPy contendo os resultados.
     """
+    X_train_scale, __, __ = scale_data(X_train=X_train, X_test=X_test)
+
     # Criar o objeto Boruta
     boruta_selector = BorutaPy(estimator, n_estimators='auto', max_iter=max_iter, random_state=random_state)
 
     # Executar o Boruta
-    boruta_selector.fit(X.values, y.values)
+    boruta_selector.fit(X_train_scale, y_train)
 
     # print ranking with selected feature names
-    print(pd.DataFrame({'feature': X.columns, 'rank': boruta_selector.ranking_}).sort_values(by='rank', ascending=True))
+    rank = pd.DataFrame({'feature': X_train.columns, 'rank': boruta_selector.ranking_}).sort_values(by='rank', ascending=True)
+    print(rank)
 
-    return boruta_selector
+    # selected features
+    selected_features = X_train.columns[boruta_selector.support_].to_list()
+
+    return boruta_selector, selected_features
 
 def run_rfe(X_train: pd.DataFrame, y_train: pd.Series, columns: List[str], estimator: Any, n_features_to_select: int = None):
     """
@@ -313,9 +319,6 @@ def run_lasso(X_train, y_train, X_test, scaler='standard'):
     # print ranking with selected feature names
     rank = pd.DataFrame({'feature': X_train.columns, 'coef': lasso_selector.coef_}).sort_values(by='coef', ascending=False)
     print(rank)
-
-    # index of columns to keep
-    idx = rank[rank['coef'] != 0]['feature'].index
 
     # resulting feature names as a list
     selected_features = rank[rank['coef'] != 0]['feature'].tolist()
