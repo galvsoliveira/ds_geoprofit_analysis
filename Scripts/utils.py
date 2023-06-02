@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Callable
 import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -43,16 +43,20 @@ def balance_data(X: pd.DataFrame, y: pd.Series, method: str = 'under', random_st
 
     return X_resampled, y_resampled
 
-def scale_data(X_train: pd.DataFrame, X_test: pd.DataFrame, selected_features:List[str]=None, method: str = 'standard') -> pd.DataFrame:
+def scale_data(X_train: pd.DataFrame, X_test: pd.DataFrame, selected_features:List[str]=None, method: str = 'standard'):
     """
-    Scale the data in a DataFrame using the specified method.
+    Escalar os dados em um DataFrame usando o método especificado.
 
-    Parameters
-    - df: The DataFrame to scale.
-    - method: The scaling method to use. Options are 'standard', 'minmax', and 'robust'.
+    Parâmetros:
+    - X_train: O DataFrame de treinamento.
+    - X_test: O DataFrame de teste.
+    - selected_features: Lista de características selecionadas. Se None, todas as características serão escaladas.
+    - method: O método de escalonamento a ser usado. As opções são 'standard', 'minmax' e 'robust'.
 
-    Returns
-    - scaled_df: The scaled DataFrame.
+    Retorna:
+    - X_train_scaled: O DataFrame de treinamento escalado.
+    - X_test_scaled: O DataFrame de teste escalado.
+    - scaler: O objeto de escalonamento usado.
     """
     # Create a copy of the DataFrame to avoid modifying the original data
     X_train = X_train.copy()
@@ -91,21 +95,21 @@ def train_model_with_grid_search(X: pd.DataFrame,
                                  save_path: str = 'modelo_com_scaler_e_grid.joblib',
                                  scaling_method: str = None):
     """
-    Train a model using GridSearch and save the best model along with the scaler.
+    Treinar um modelo utilizando GridSearch e salva o melhor modelo juntamente com o escalonador.
 
-    Parameters:
-    - X: The feature matrix.
-    - y: The target vector.
-    - model: The model to be trained.
-    - param_grid: The parameter grid for GridSearch.
-    - test_size: The proportion of test data.
-    - random_state: The random seed for reproducibility.
-    - balance_training: The resampling method to balance the training data ('under', 'over', 'smote' or None).
-    - save_path: The file path to save the trained model.
-    - scaling_method: The scaling method to use. Options are 'standard', 'minmax', and 'robust'.
+    Parâmetros:
+    - X: A matriz de características.
+    - y: O vetor alvo.
+    - model: O modelo a ser treinado.
+    - param_grid: O grid de parâmetros para o GridSearch.
+    - test_size: A proporção de dados de teste.
+    - random_state: A semente aleatória para reprodutibilidade.
+    - balance_training: O método de reamostragem para balancear os dados de treinamento ('under', 'over', 'smote' ou None).
+    - save_path: O caminho do arquivo para salvar o modelo treinado.
+    - scaling_method: O método de escalonamento a ser usado. As opções são 'standard', 'minmax' e 'robust'.
 
-    Returns:
-    - None
+    Retorno:
+    - Nenhum.
     """
     # Split the data into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
@@ -230,17 +234,19 @@ def find_potential_outliers(df: pd.DataFrame, target_col: str):
 
 def run_boruta(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, estimator: Any, max_iter: int = 100, random_state: int = 42):
     """
-    Executar o algoritmo Boruta para seleção de recursos.
+    Executar o algoritmo Boruta para seleção de recursos em um conjunto de dados.
 
     Parâmetros:
-    - X: A matriz de características.
-    - y: O vetor alvo.
-    - estimator: O estimador base usado pelo Boruta.
-    - max_iter: O número máximo de iterações.
-    - random_state: A semente aleatória para reprodutibilidade.
+    - `X_train`: A matriz de características do conjunto de treinamento.
+    - `y_train`: O vetor alvo do conjunto de treinamento.
+    - `X_test`: A matriz de características do conjunto de teste.
+    - `estimator`: O estimador base usado pelo Boruta.
+    - `max_iter`: O número máximo de iterações.
+    - `random_state`: A semente aleatória para reprodutibilidade.
 
     Retorna:
-    - boruta_selector: Objeto BorutaPy contendo os resultados.
+    - `boruta_selector`: Um objeto BorutaPy contendo os resultados.
+    - `selected_features`: Uma lista de nomes das características selecionadas.
     """
     X_train_scale, __, __ = scale_data(X_train=X_train, X_test=X_test)
 
@@ -259,51 +265,55 @@ def run_boruta(X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, 
 
     return boruta_selector, selected_features
 
-def run_rfe(X_train: pd.DataFrame, y_train: pd.Series, columns: List[str], estimator: Any, n_features_to_select: int = None):
+def run_rfe(X_train: pd.DataFrame, y_train: pd.Series, X_test, columns: List[str], estimator: Any, n_features_to_select: int = None, scaler: str = 'standard'):
     """
-    Run the RFE algorithm for feature selection.
+    Executa o algoritmo RFE para seleção de recursos.
 
-    Parameters
-    ----------
-    - X_train: The feature matrix.
-    - y_train: The target vector.
-    - estimator: The base estimator used by RFE.
-    - n_features_to_select: The number of features to select.
+    Parâmetros:
+    - X_train (pd.DataFrame): A matriz de características de treinamento.
+    - y_train (pd.Series): O vetor alvo.
+    - X_test (pd.DataFrame): A matriz de características de teste.
+    - columns (List[str]): Lista de colunas a serem plotadas
+    - estimator (Any): O estimador base usado pelo RFE.
+    - n_features_to_select (int, opcional): O número de recursos a serem selecionados.
+    - scaler (str, opcional): O método de escala a ser usado. Opções são 'standard', 'minmax' e 'robust'.
 
-    Returns
-    -------
-    - rfe_selector: RFE object containing the results.
+    Retorna:
+    - rfe_selector (RFE): Objeto RFE contendo os resultados.
+    - selected_features (List[str]): Lista com os nomes dos recursos selecionados.
     """
-    # Create the RFE object
+    # Escala os dados
+    X_train_scale, __, __ = scale_data(X_train=X_train, X_test=X_test, method=scaler)
+
+    # Cria o objeto RFE
     rfe_selector = RFE(estimator, n_features_to_select=n_features_to_select)
 
-    # Run RFE
-    rfe_selector.fit(X_train, y_train)
+    # Executa o RFE
+    rfe_selector.fit(X_train_scale, y_train)
 
-    # print ranking with selected feature names
-    print(pd.DataFrame({'feature': columns, 'rank': rfe_selector.ranking_}).sort_values(by='rank', ascending=True))
+    # Imprime o ranking com os nomes dos recursos selecionados
+    rank = pd.DataFrame({'feature': columns, 'rank': rfe_selector.ranking_}).sort_values(by='rank', ascending=True)
+    print(rank)
 
-    # select features
-    X_filtered = rfe_selector.transform(X_train)
+    # Nomes dos recursos resultantes como uma lista
+    selected_features = rank[rank['rank'] == 1]['feature'].tolist()
 
-    return rfe_selector, X_filtered
+    return rfe_selector, selected_features
+
 
 def run_lasso(X_train, y_train, X_test, scaler='standard'):
     """
-    Run the LASSO algorithm for feature selection.
+    Executa o algoritmo LASSO para seleção de recursos.
 
-    Parameters
-    ----------
-    - X_test: The test feature matrix.
-    - X_train: The training feature matrix.
-    - y_train: The target vector.
-    - columns: The list of column names from X.
+    Parâmetros:
+    - X_train (pd.DataFrame): A matriz de características de treinamento.
+    - y_train (pd.Series): O vetor alvo.
+    - X_test (pd.DataFrame): A matriz de características de teste.
+    - scaler (str, opcional): O método de escala a ser usado. Opções são 'standard', 'minmax' e 'robust'.
 
-    Returns
-    -------
-    - lasso_selector: LassoCV object containing the results.
-    - X_test_filtered: Filtered version of X_test.
-    - X_train_filtered: Filtered version of X_train.
+    Retorna:
+    - lasso_selector (LassoCV): Objeto LassoCV contendo os resultados.
+    - selected_features (List[str]): Lista com os nomes dos recursos selecionados.
     """
     #scale data
     X_train_scale, __, __ = scale_data(X_train=X_train, X_test=X_test, method=scaler)
@@ -323,23 +333,37 @@ def run_lasso(X_train, y_train, X_test, scaler='standard'):
 
     return lasso_selector, selected_features
 
-def plot_facetgrid(df, columns, hue=None, plot_func=sns.boxplot):
-    # Melt the DataFrame to create a "long" format
+def plot_facetgrid(df: pd.DataFrame, columns: List[str], hue: Optional[str] = None, plot_func: Callable = sns.boxplot):
+    """
+    Função para criar um FacetGrid com o Seaborn.
+
+    Parâmetros:
+    - df (pd.DataFrame): DataFrame com os dados a serem plotados
+    - columns (List[str]): Lista de colunas a serem plotadas
+    - hue (Optional[str]): Coluna para usar como variável de agrupamento (opcional)
+    - plot_func (Callable): Função de plotagem do Seaborn a ser usada (padrão: sns.boxplot)
+
+    Retorna:
+    - g (sns.FacetGrid): Objeto FacetGrid criado
+    """
+    # Derrete o DataFrame para criar um formato "longo"
     id_vars = [hue] if hue is not None else []
     melted_df = df[columns + id_vars].melt(id_vars=id_vars, var_name='Column', value_name='Value')
 
-    # Calculate the col_wrap value based on the number of columns
+    # Calcula o valor de col_wrap com base no número de colunas
     col_wrap = math.ceil(len(columns) / 2)
 
-    # Create a FacetGrid object with sharex=False and sharey=False
+    # Cria um objeto FacetGrid com sharex=False e sharey=False
     g = sns.FacetGrid(melted_df, col='Column', hue=hue, col_wrap=col_wrap, sharex=False, sharey=False)
 
-    # Map the specified plotting function to the FacetGrid
+    # Mapeia a função de plotagem especificada para o FacetGrid
     if plot_func == sns.boxplot:
         g.map(plot_func, 'Value', order=sorted(melted_df['Column'].unique()))
     else:
         g.map(plot_func, 'Value')
 
-    # Add a legend if hue is not None
+    # Adiciona uma legenda se hue não for None
     if hue is not None:
         g.add_legend()
+
+    return g
