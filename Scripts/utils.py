@@ -335,8 +335,8 @@ def plot_facetgrid(df, columns, hue=None, plot_func=sns.boxplot):
     g = sns.FacetGrid(melted_df, col='Column', hue=hue, col_wrap=col_wrap, sharex=False, sharey=False)
 
     # Map the specified plotting function to the FacetGrid
-    if plot_func == sns.boxplot and hue is not None:
-        g.map(plot_func, 'Value', order=sorted(df[hue].unique()))
+    if plot_func == sns.boxplot:
+        g.map(plot_func, 'Value', order=sorted(melted_df['Column'].unique()))
     else:
         g.map(plot_func, 'Value')
 
