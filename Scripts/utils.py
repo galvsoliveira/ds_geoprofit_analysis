@@ -9,6 +9,8 @@ from imblearn.over_sampling import SMOTE, RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.feature_selection import RFE
 from sklearn.linear_model import LassoCV
+import seaborn as sns
+import math
 
 def balance_data(X: pd.DataFrame, y: pd.Series, method: str = 'under', random_state: int = 42):
     """
@@ -321,3 +323,23 @@ def run_lasso(X_train, y_train, X_test, scaler='standard'):
 
     return lasso_selector, selected_features
 
+def plot_facetgrid(df, columns, hue=None, plot_func=sns.boxplot):
+    # Melt the DataFrame to create a "long" format
+    id_vars = [hue] if hue is not None else []
+    melted_df = df[columns + id_vars].melt(id_vars=id_vars, var_name='Column', value_name='Value')
+
+    # Calculate the col_wrap value based on the number of columns
+    col_wrap = math.ceil(len(columns) / 2)
+
+    # Create a FacetGrid object with sharex=False and sharey=False
+    g = sns.FacetGrid(melted_df, col='Column', hue=hue, col_wrap=col_wrap, sharex=False, sharey=False)
+
+    # Map the specified plotting function to the FacetGrid
+    if plot_func == sns.boxplot and hue is not None:
+        g.map(plot_func, 'Value', order=sorted(df[hue].unique()))
+    else:
+        g.map(plot_func, 'Value')
+
+    # Add a legend if hue is not None
+    if hue is not None:
+        g.add_legend()
