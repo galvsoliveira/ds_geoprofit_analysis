@@ -414,7 +414,7 @@ def plotAllLocations(df):
 
 def getLatLng(neighborhood, api_key):
     gmaps = googlemaps.Client(key=api_key)
-    geocode_result = gmaps.geocode(neighborhood + ', São Paulo, Brazil')
+    geocode_result = gmaps.geocode(neighborhood + ', São Paulo - State of São Paulo Brazil')
     lat = geocode_result[0]['geometry']['location']['lat']
     lng = geocode_result[0]['geometry']['location']['lng']
     return (lat, lng)
