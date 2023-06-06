@@ -11,6 +11,9 @@ from sklearn.feature_selection import RFE
 from sklearn.linear_model import LassoCV
 import seaborn as sns
 import math
+import folium
+import branca
+import googlemaps
 
 def balance_data(X: pd.DataFrame, y: pd.Series, method: str = 'under', random_state: int = 42):
     """
@@ -367,3 +370,51 @@ def plot_facetgrid(df: pd.DataFrame, columns: List[str], hue: Optional[str] = No
         g.add_legend()
 
     return g
+
+def plotAllLocations(df):
+    # Find the row with the highest revenue
+    highest_revenue_row = df.loc[df['faturamento'].idxmax()]
+
+    # Create a map centered at the location with highest revenue
+    map = folium.Map(location=[highest_revenue_row['lat'], highest_revenue_row['lng']], zoom_start=13)
+
+    # Create a dictionary to map 'potencial' values to numerical values
+    potencial_mapping = {'Baixo': 0, 'Médio': 0.5, 'Alto': 1}
+
+    # Create a colormap for the markers
+    colormap = branca.colormap.LinearColormap(
+        colors=['#054fb9', '#8babf1', '#c44601'],
+        index=[0, 0.5, 1],
+        vmin=0,
+        vmax=1
+    )
+
+    # Add circular markers for each location in the DataFrame
+    for index, row in df.iterrows():
+        folium.CircleMarker(
+            [row['lat'], row['lng']],
+            radius=row['faturamento'] / 100000,
+            popup=f"potencial: {row['potencial']}",
+            color=colormap(potencial_mapping[row['potencial']]),
+            fill=True,
+            fill_color=colormap(potencial_mapping[row['potencial']]),
+            fill_opacity=0.8
+        ).add_to(map)
+
+        folium.Marker(
+            [row['lat'], row['lng']],
+            popup=f"Bairro: {row['nome']} \n Faturamento: {row['faturamento']} \n Potencial: {row['potencial']}"
+        ).add_to(map)
+
+    # Add the colormap to the map
+    colormap.caption = 'potencial'
+    colormap.add_to(map)
+
+    return map
+
+def getLatLng(neighborhood, api_key):
+    gmaps = googlemaps.Client(key=api_key)
+    geocode_result = gmaps.geocode(neighborhood + ', São Paulo, Brazil')
+    lat = geocode_result[0]['geometry']['location']['lat']
+    lng = geocode_result[0]['geometry']['location']['lng']
+    return (lat, lng)
