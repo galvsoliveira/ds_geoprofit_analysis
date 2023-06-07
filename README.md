@@ -29,7 +29,7 @@ Foram analisados os dados fornecidos e aplicado técnicas de ciência de dados p
 
 ### 1. Estimativa de Faturamento
 
-Foi realizada uma análise dos dados de faturamento e sociodemografia dos bairros de São Paulo, utilizando técnicas de machine learning (regressão linear) para estimar o faturamento que uma loja teria em cada um dos bairros. Obtendo um 93% de acurácia nos dados de teste.
+Foi realizada uma análise dos dados de faturamento e sociodemografia dos bairros de São Paulo, utilizando técnicas de machine learning (regressão linear) para estimar o faturamento que uma loja teria em cada um dos bairros utilizando como base os dados sociodemograficos e de faturamento nos bairro do Rio de Janeiro. Foi obtido 93% de acurácia nos dados de teste.
 
 ![image](https://github.com/galvsoliveira/ds_geoprofit_analysis/assets/95829723/bbfd875d-df58-4a4e-8e58-4d428c6731de)
 
