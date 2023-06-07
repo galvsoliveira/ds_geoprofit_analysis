@@ -1,8 +1,5 @@
 # Análise dos Bairros de São Paulo
 
-![image](https://github.com/galvsoliveira/ds_geoprofit_analysis/assets/95829723/1a2dd245-8c61-4f04-a12f-1d435e65f4cc)
-
-
 Para ver os Notebooks completos sugiro usar o site https://nbviewer.org/. Exemplo: https://nbviewer.org/github/galvsoliveira/ds_geoprofit_analysis/blob/main/Notebooks/4__exploratory_data_analysis_sp.ipynb. Onde podemos ver os gráficos do Folium.
 
 Para rodar os arquivos do repositório primeiro rode os seguintes comandos em ordem (ubuntu 22.04, python 3.10):
@@ -40,6 +37,8 @@ Foi realizada uma análise dos dados de faturamento e sociodemografia dos bairro
 
 Utilizando como base o potencial dos bairros do Rio de Janeiro, foi feita uma classificação do potencial de São Paulo usando técnicas de classificação de Machine Learning para comparar as duas cidades e ver quão vantajoso será São Paulo em relação ao Rio de Janeiro. Após isso, foi feito uma análise comparativa com os dados dos bairros de São Paulo para classificar o potencial de cada bairro como Alto, Médio ou Baixo. Foram utilizadas técnicas de agrupamento e análise exploratória para identificar padrões e características dos bairros.
 
+![image](https://github.com/galvsoliveira/ds_geoprofit_analysis/assets/95829723/7c0ee7a1-08a4-428d-b357-50340ca5b262)
+
 ### 3. Segmentação por Renda e Idade
 
 Foi realizada uma segmentação dos bairros de São Paulo com base nos dados de renda e idade, a fim de identificar aqueles com maior aderência ao público-alvo da empresa alimentícia. Foram utilizadas técnicas de agrupamento e visualização de dados para identificar grupos de bairros com características semelhantes, onde foi possível construir uma tabela dinâmica e um gráfico dos bairros com melhor aderência.
@@ -50,6 +49,7 @@ Foi realizada uma segmentação dos bairros de São Paulo com base nos dados de 
 ## Resultados
 
 Como resultado da análise, foi gerado um documento contendo as conclusões e insights obtidos durante a análise dos bairros de São Paulo. O documento foi elaborado de forma a ser compreensível para pessoas não técnicas, utilizando gráficos, tabelas e descrições para apresentar as conclusões de forma clara e objetiva. Destacamos que o bairro com maior aderência do público alvo foi o bairro de Moema.
+![image](https://github.com/galvsoliveira/ds_geoprofit_analysis/assets/95829723/1a2dd245-8c61-4f04-a12f-1d435e65f4cc)
 
 ## Melhorias
 
