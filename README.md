@@ -1,5 +1,8 @@
 # Análise dos Bairros de São Paulo
 
+![image](https://github.com/galvsoliveira/ds_geoprofit_analysis/assets/95829723/1a2dd245-8c61-4f04-a12f-1d435e65f4cc)
+
+
 Para ver os Notebooks completos sugiro usar o site https://nbviewer.org/. Exemplo: https://nbviewer.org/github/galvsoliveira/ds_geoprofit_analysis/blob/main/Notebooks/4__exploratory_data_analysis_sp.ipynb. Onde podemos ver os gráficos do Folium.
 
 Para rodar os arquivos do repositório primeiro rode os seguintes comandos em ordem (ubuntu 22.04, python 3.10):
