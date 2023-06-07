@@ -34,6 +34,8 @@ Foram analisados os dados fornecidos e aplicado técnicas de ciência de dados p
 
 Foi realizada uma análise dos dados de faturamento e sociodemografia dos bairros de São Paulo, utilizando técnicas de machine learning (regressão linear) para estimar o faturamento que uma loja teria em cada um dos bairros. Obtendo um 93% de acurácia nos dados de teste.
 
+![image](https://github.com/galvsoliveira/ds_geoprofit_analysis/assets/95829723/bbfd875d-df58-4a4e-8e58-4d428c6731de)
+
 ### 2. Classificação de Potencial
 
 Utilizando como base o potencial dos bairros do Rio de Janeiro, foi feita uma classificação do potencial de São Paulo usando técnicas de classificação de Machine Learning para comparar as duas cidades e ver quão vantajoso será São Paulo em relação ao Rio de Janeiro. Após isso, foi feito uma análise comparativa com os dados dos bairros de São Paulo para classificar o potencial de cada bairro como Alto, Médio ou Baixo. Foram utilizadas técnicas de agrupamento e análise exploratória para identificar padrões e características dos bairros.
@@ -41,6 +43,9 @@ Utilizando como base o potencial dos bairros do Rio de Janeiro, foi feita uma cl
 ### 3. Segmentação por Renda e Idade
 
 Foi realizada uma segmentação dos bairros de São Paulo com base nos dados de renda e idade, a fim de identificar aqueles com maior aderência ao público-alvo da empresa alimentícia. Foram utilizadas técnicas de agrupamento e visualização de dados para identificar grupos de bairros com características semelhantes, onde foi possível construir uma tabela dinâmica e um gráfico dos bairros com melhor aderência.
+
+![image](https://github.com/galvsoliveira/ds_geoprofit_analysis/assets/95829723/9d67e875-a8f1-470f-b5f4-f395e1e077ed)
+
 
 ## Resultados
 
